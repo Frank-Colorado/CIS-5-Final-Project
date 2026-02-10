@@ -16,6 +16,7 @@ using std::setprecision;
 using std::srand;
 using std::rand;
 using std::time;
+using std::min;
 
 // ------------------------------------------------
 // PLAYER STRUCTURE
@@ -24,6 +25,7 @@ struct Player {
 	string name;
 	int hp;
 	int atkPwr;
+	int block = 0; // Block stat that can be increased by using a block action in combat. I set it to 0 by default and I will reset it to 0 at the end of each combat.
 	string inventory[3]; // Simple inventory with 3 slots
 	int inventorySize = 0; // Inventory starts empty
 
@@ -155,7 +157,8 @@ enum CombatResult {
 // FUNCTION PROTOTYPES
 // -----------------------------------------------
 CombatResult combat(Player& player, Monster& monster);
-int rollDmg();
+int rollD20();
+void applyDamage(Player& player, int damage);
 
 
 
@@ -293,8 +296,42 @@ int main() {
 }
 
 // This function will roll a 20 sided die and return the result as an integer. 
-int rollDmg() {
+int rollD20() {
 	return rand() % 20 + 1; 
+}
+
+// This function will apply damage to the player. It will calculate the damage taken while taking in to consideration the player's block stat
+// This function takes 2 parameters
+// 1. A reference to the player object
+// 2. An integer for the amount of damage being dealt to the player before block is applied
+void applyDamage(Player& player, int damage) {
+	// First we check to see if the player has any block at all
+	if (player.block > 0) {
+		// If they do then we check to see if either the player's block or the damage being dealt is greater 
+		// Min finds the smaller of the two values and that is the amount of damage that will be absorbed by the player's block
+		int absorbedDamage = min(player.block, damage);
+		// We subtract the absorber damage from the player's block stat
+		// For example if the player has 10 block and they are being dealt 15 damage then 'absorbedDamage' will be 10 and the player's block will be reduced to 0
+		// If the player has 10 block and they are being dealt 5 damage then 'absorbedDamage' will be 5 and the player's block will be reduced to 5
+		player.block -= absorbedDamage;
+		// Then we also subtract the absorbed damage from the total damage being dealt to the player so that we can calculate the final damage that will be subtracter from the player's HP
+		// In this case, if the player has 10 block and they are being dealt 15 damage then 'absorbedDamage' will be 10 and the damage will be reduced to 5 which is the amount that will be subtracted from the player's HP
+		// But if the player had 10 block and they were being dealt 5 damage then 'absorbedDamage' will be 5 and the damage will be reduced to 0.
+		// This means the future conditional check for damage > 0 will be false and the player's HP stat won't be modified
+		damage -= absorbedDamage;
+
+		// Tell the player how much damage their block absorbed and how much block they have left
+		cout << "Your block absorbed " << absorbedDamage << " damage!" << endl;
+		cout << "Your remaining block is: " << player.block << endl;
+	}
+
+	// After we have checked to see if the player has any block then we check to see if there is any damage left to apply to the player's HP after block has been applied
+	// In this case, if the player had no block then the damage value passed in would not be modified and then the full damage would be done to the player's HP.
+	// If the player did block, then the damage value passed in would be reduced by the amount of block that the player had or the full amount might have been absorbed.
+	if (damage > 0) {
+		player.hp -= damage; 
+		cout << "You take " << damage << " damage! Your remaining HP is: " << player.hp << endl;
+	}
 }
 
 // This function will handle the combat between the player and a monster.
@@ -326,21 +363,31 @@ CombatResult combat(Player& player, Monster& monster) {
 
 		switch (actionChoice) {
 		case ATTACK:
-		// If the player chooses to attack then we calculate the damage they deal the monster by rolling a 20 sided die
-		// Then we add the player's attack power to the damage rolled 
-			int playerDmg = rollDmg() + player.atkPwr;
+			// If the player chooses to attack then we calculate the damage they deal the monster by rolling a 20 sided die
+			// Then we add the player's attack power to the damage rolled 
+			int playerDmg = rollD20() + player.atkPwr;
 			// We subtract the damage dealt from the monster's HP
 			monster.hp -= playerDmg;
 			// Then we print out the damage dealt to the monster
 			cout << "You attack the " << monster.name << " and deal " << playerDmg << " damage!" << endl;
 			break;
 		case BLOCK:
+			// If the player chooses to block then we will increase their block stat by rolling a D20. 
+			// This block stat will reduce the damage taken from attacks 
+			int blockAmount = rollD20();
+			// We add the block amount to the player's block stat
+			player.block += blockAmount;
+			// We also print out the amount that the player has blocked for this turn
+			cout << "You block and increase your block stat by " << blockAmount << " for this turn!" << endl;
+			// Then we print what the player's new block stat total is
+			cout << "Your current block stat is: " << player.block << endl;
+			break;
 		case USE_ITEM:
-		// If the player chooses to use an item then we call the useItem method from the Player structure 
+			// If the player chooses to use an item then we call the useItem method from the Player structure 
 			player.useItem();
 			break;
 		case EXIT:
-		// If the player chooses to exit combat then we set combatOver to true to end the combat loop and we return the result of PLAYER_EXITED
+			// If the player chooses to exit combat then we set combatOver to true to end the combat loop and we return the result of PLAYER_EXITED
 			cout << "You have chosen to exit combat." << endl;
 			combatOver = true;
 			result = PLAYER_EXITED;
@@ -352,9 +399,12 @@ CombatResult combat(Player& player, Monster& monster) {
 
 		// After the player's turn we check to see if the monster is still alive. 
 		if (monster.hp > 0) {
-			// If the monster is still alive then it takes its turn to attack the player
-			cout << "The " << monster.name << " attacks you!" << endl;
-			player.hp -= monster.atkPwr; // The monster's attack power is subtracted from the player's HP
+			// We calculate the damage the monster deals to the player by rolling a D20 and adding the monster's attack power
+			int monsterDmg = rollD20() + monster.atkPwr;
+			// Then we print out the damage that the monster is trying to deal to the player
+			cout << "The " << monster.name << " attacks you for " << monsterDmg << " damage!" << endl;
+
+
 		}
 		
 	}
