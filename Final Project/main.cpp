@@ -26,7 +26,7 @@ struct Player {
 	int hp;
 	int atkPwr;
 	int block = 0; // Block stat that can be increased by using a block action in combat. I set it to 0 by default and I will reset it to 0 at the end of each combat.
-	string inventory[3]; // Simple inventory with 3 slots
+	Item inventory[3]; // Simple inventory with 3 slots
 	int inventorySize = 0; // Inventory starts empty
 
 	Player(const string& name, int hp, int atkPwr) : name(name), hp(hp), atkPwr(atkPwr) {}
@@ -35,7 +35,7 @@ struct Player {
 		cout << "You currently have " << hp << " HP and " <<atkPwr << " attack power." << endl;
 	}
 
-	void addItem(const string& item) {
+	void addItem(const Item& item) {
 		// Check the current inventory size before adding an item
 		if (inventorySize < 3) {
 			inventory[inventorySize] = item;
@@ -97,10 +97,10 @@ struct Player {
 		}
 
 		// I create a variable to hold the string value of the item that the player has chosen to use
-		string selectedItem = inventory[choice - 1];
+		Item selectedItem = inventory[choice - 1];
 
-		// Then we check to see what item the player has chosen and apply its effects
-		if (selectedItem == "Health Potion") {
+		switch (selectedItem) {
+		case HEALTH_POTION:
 			hp += 50; // Heal the player by 50 HP
 			// I don't want the player's HP to exceed 100 so I check to see if it does and if so I set it back to 100
 			if (hp > 100) {
@@ -108,13 +108,17 @@ struct Player {
 			};
 			// Display the player's new stat total
 			displayStats();
-		}
-		else if (selectedItem == "Strength Elixir") {
+			break;
+		case STRENGTH_ELIXIR:
 			// If the selected item is a strength elixr then we add 20 points to their atk
 			atkPwr += 20;
 			// Display the player's new stat total
-		}
-
+			displayStats();
+			break;
+		default:
+			cout << "Invalid item! Please select a valid item number." << endl;
+			return;
+		};
 		// Finally we remove the used item from the player's inventory 
 		// We set i to the index of the item that the player has chosen to use
 		// We loop through the inventory as long as i is less than the inventory size -1. This is because we want to shift the items and the new last item in the inventory will be empty after the shift so we don't want to include it in the loop
@@ -153,6 +157,14 @@ enum CombatResult {
 	PLAYER_WON,
 	PLAYER_DIED,
 	PLAYER_EXITED,
+};
+
+// ------------------------------------------------
+// ITEM ENUM
+// ------------------------------------------------
+enum Item {
+	HEALTH_POTION,
+	STRENGTH_ELIXIR
 };
 
 // -----------------------------------------------
@@ -208,6 +220,8 @@ int main() {
 	while (!gameOver) {
 		// We use a switch statement to determine what happens in each room based on the current room number
 		switch (currentRoom) {
+
+		// ------------------------------------------------ ROOM 1 ------------------------------------------------
 		case 1:
 			// Here we initiate the first room of the dungeon and give the player a choice to either explore the chamber or head down the hallway
 			// We also give the player the basic options to check their stats, inventory, or exit the game
@@ -223,6 +237,7 @@ int main() {
 			int roomChoice;
 			cin >> roomChoice;
 
+			// ----------------------------------------------- ROOM 1 CHOICES ------------------------------------------------
 			switch (roomChoice) {
 			case 1:
 				// If the player chooses to head down the hallway then we move to the next room 
@@ -239,6 +254,7 @@ int main() {
 				CombatResult combatResult = combat(player, goblin);
 				// After the combat we check to return type of the combat result 
 				if (combatResult == PLAYER_WON) {
+					cout << "After your victory you decide to head down the hallway..." << endl;
 					// If the player won the combat then we move to the next room
 					currentRoom++;
 				}
@@ -276,11 +292,50 @@ int main() {
 				break;
 			}
 			break;
+
+		// ------------------------------------------------ ROOM 2 ------------------------------------------------
 		case 2:
-			cout << "You enter the second room and are confronted by an orc!" << endl;
-			// Here we would call a function to handle the combat between the player and the orc
-			currentRoom++;
+			cout << "After traversing the long, narrow hallway you enter a dimly lit room. As your stomble around the room you find your self face to face with a large orc!" << endl;
+			cout << "You realize the orc seems to be holding something shiny that you might want." << endl;
+			cout << "You could challenge the orc and take what it's holding for yourself or you could use the darkness of the room to flee but you might not escape unscathed.";
+			cout << "1: Challenge the orc for the shiny object." << endl;
+			cout << "2. Make a run for it!" << endl;
+			cout << "3. Currents Stats" << endl;
+			cout << "4. Inventory" << endl;
+			cout << "5. Exit Game" << endl;
+			
+			// We get the player's choice for this room 
+			int room2Choice;
+			cin >> room2Choice;
+			// ----------------------------------------------- ROOM 2 CHOICES ------------------------------------------------
+			switch (room2Choice) {
+			case 1: {
+				cout << "You decide to challenge the orc for the shiny object. You engage in combat with the orc!" << endl;
+				// Here we call the function to handle the combat between the player and the orc
+				CombatResult combatResult = combat(player, orc);
+				// After the combat we check to return type of the combat result
+				if (combatResult == PLAYER_WON) {
+					cout << "After your victory you take the shiny object off the orc and find that it was a strength elixir! You add it to your inventory and then you head to the next room..." << endl;
+					// Add the strength elix to the player's inventory 
+					player.addItem("Strength Elixer");
+					// Then we move on to the next room 
+					currentRoom++;
+				}
+				else if (combatResult == PLAYER_DIED) {
+					// If the player died in combat then we tell the player that they have died and end the game by setting gameOver to true
+					cout << "You have died in combat to the " << orc.name << " . Game Over." << endl;
+					gameOver = true;
+				}
+				else if (combatResult == PLAYER_EXITED) {
+					// If the player chose to exit combat then we tell the player that they have fled and abandoned their quest and end the game by setting gameOver to true
+					cout << "You have fled from combat and abandoned your quest. Game Over." << endl;
+					gameOver = true;
+				}
+				break;
+			}
 			break;
+		}
+		// ------------------------------------------------ ROOM 3 ------------------------------------------------
 		case 3:
 			cout << "You enter the final room and face off against a powerful necromancer!" << endl;
 			// Here we would call a function to handle the combat between the player and the necromancer
@@ -292,7 +347,7 @@ int main() {
 			cout << "You have exited the dungeon<" << endl;
 			gameOver = true; // End the game if there is an invalid room number
 			break;
-		}
+			}
 		}
 	}
 
