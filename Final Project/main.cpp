@@ -73,12 +73,14 @@ struct Player {
 		// Check to see if there are any items in the inventory before displaying
 		if (inventorySize == 0) {
 			cout << "Your inventory is empty!" << endl;
+			return; // Exit the method if there are no items to use
 		}
 
 		// Call the method to display the player's inventory
 		displayInventory();
 
 		// Get the player's choice
+		cout << "Select the number of the item you want to use or 0 to close your inventory: ";
 		int choice; 
 		cin >> choice;
 
@@ -228,7 +230,7 @@ int main() {
 				cout << "You cautiously make your way down the hallway..." << endl;
 				currentRoom++; // Move to the next room
 				break;
-			case 2:
+			case 2: {
 				// If the player choose to explore the chamber then we give them a reward but also a consequence for taking something that wasn't theirs
 				cout << "You decide to explore the chamber and find a health potion hidden in a chest! But something in the shadows of the great chamber seems upset that you took something that wasn't yours. You are confronted by a Goblin!" << endl;
 				// We add the health potion to the player's inventory
@@ -251,6 +253,8 @@ int main() {
 					gameOver = true;
 				}
 				break;
+			}
+		
 			case 3: 
 				// If the player chooses to check stats then we call displayStats method
 				player.displayStats();
@@ -283,11 +287,12 @@ int main() {
 			// If the player wins then they have completed the game and we set gameOver to true to end the loop
 			gameOver = true;
 			break;
-		default:
+		default: {
 			// If the current room number does not match any of the cases then we end the game 
 			cout << "You have exited the dungeon<" << endl;
 			gameOver = true; // End the game if there is an invalid room number
 			break;
+		}
 		}
 	}
 
@@ -362,7 +367,7 @@ CombatResult combat(Player& player, Monster& monster) {
 
 
 		switch (actionChoice) {
-		case ATTACK:
+		case ATTACK: {
 			// If the player chooses to attack then we calculate the damage they deal the monster by rolling a 20 sided die
 			// Then we add the player's attack power to the damage rolled 
 			int playerDmg = rollD20() + player.atkPwr;
@@ -371,7 +376,9 @@ CombatResult combat(Player& player, Monster& monster) {
 			// Then we print out the damage dealt to the monster
 			cout << "You attack the " << monster.name << " and deal " << playerDmg << " damage!" << endl;
 			break;
-		case BLOCK:
+		}
+	
+		case BLOCK: {
 			// If the player chooses to block then we will increase their block stat by rolling a D20. 
 			// This block stat will reduce the damage taken from attacks 
 			int blockAmount = rollD20();
@@ -382,16 +389,22 @@ CombatResult combat(Player& player, Monster& monster) {
 			// Then we print what the player's new block stat total is
 			cout << "Your current block stat is: " << player.block << endl;
 			break;
-		case USE_ITEM:
+		}
+
+		case USE_ITEM: {
 			// If the player chooses to use an item then we call the useItem method from the Player structure 
 			player.useItem();
 			break;
-		case EXIT:
+		}
+		
+		case EXIT: {
 			// If the player chooses to exit combat then we set combatOver to true to end the combat loop and we return the result of PLAYER_EXITED
 			cout << "You have chosen to exit combat." << endl;
 			combatOver = true;
 			result = PLAYER_EXITED;
 			break;
+		}
+	
 		default:
 			cout << "Invalid choice! Please select a valid action number." << endl;
 			break;
@@ -403,10 +416,11 @@ CombatResult combat(Player& player, Monster& monster) {
 			int monsterDmg = rollD20() + monster.atkPwr;
 			// Then we print out the damage that the monster is trying to deal to the player
 			cout << "The " << monster.name << " attacks you for " << monsterDmg << " damage!" << endl;
-
-
+			// Then we call the applyDamage function to apply the damage to the player
+			applyDamage(player, monsterDmg);
 		}
-		
+		// After the monster's turn the while loop will check again to see if both the player and monster are still alive and if combatOver is still false.
+		// If any of those conditions are false then the combat loop will break and we will check the result of the combat to see if the player won, died, or exited combat.
 	}
 
 	// After the combat loop we check to see if the player is still alive and if so we return that they won the combat. If the player is not alive then we return that they died in combat. If the player chose to exit combat then we return that they exited combat.
