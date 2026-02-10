@@ -19,6 +19,33 @@ using std::time;
 using std::min;
 
 // ------------------------------------------------
+// PLAYER COMBAT ENUM
+// ------------------------------------------------
+enum PlayerAction {
+	ATTACK = 1,
+	BLOCK,
+	USE_ITEM,
+	EXIT
+};
+
+// ------------------------------------------------
+// COMBAT RESULT ENUM
+// ------------------------------------------------
+enum CombatResult {
+	PLAYER_WON,
+	PLAYER_DIED,
+	PLAYER_EXITED,
+};
+
+// ------------------------------------------------
+// ITEM ENUM
+// ------------------------------------------------
+enum Item {
+	HEALTH_POTION,
+	STRENGTH_ELIXIR
+};
+
+// ------------------------------------------------
 // PLAYER STRUCTURE
 // ------------------------------------------------
 struct Player {
@@ -26,7 +53,7 @@ struct Player {
 	int hp;
 	int atkPwr;
 	int block = 0; // Block stat that can be increased by using a block action in combat. I set it to 0 by default and I will reset it to 0 at the end of each combat.
-	Item inventory[3]; // Simple inventory with 3 slots
+	Item inventory[3] = {}; // Simple inventory with 3 slots
 	int inventorySize = 0; // Inventory starts empty
 
 	Player(const string& name, int hp, int atkPwr) : name(name), hp(hp), atkPwr(atkPwr) {}
@@ -35,15 +62,26 @@ struct Player {
 		cout << "You currently have " << hp << " HP and " <<atkPwr << " attack power." << endl;
 	}
 
-	void addItem(const Item& item) {
+	string itemToString(const Item& item) const {
+		switch (item) {
+		case HEALTH_POTION:
+			return "Health Potion";
+		case STRENGTH_ELIXIR:
+			return "Strength Elixir";
+		default:
+			return "Unknown Item";
+		}
+	}
+
+	void addItem(const Item item) {
 		// Check the current inventory size before adding an item
 		if (inventorySize < 3) {
 			inventory[inventorySize] = item;
 			inventorySize++;
-			cout << "You have added " << item << " to your inventory." << endl;
+			cout << "You have added " << itemToString(item) << " to your inventory." << endl;
 		}
 		else {
-			cout << "Your inventory is full! You cannot add " << item << "." << endl;
+			cout << "Your inventory is full! You cannot add " << itemToString(item) << "." << endl;
 		}
 
 	}
@@ -60,7 +98,7 @@ struct Player {
 
 		// Loop through the Player's inventory and display it
 		for (int i = 0; i < inventorySize; i++) {
-			cout << (i + 1) << ": " << inventory[i] << endl;
+			cout << (i + 1) << ": " << itemToString(inventory[i]) << endl;
 		}
 
 		// Display final option for closing the inventory 
@@ -140,33 +178,6 @@ struct Monster {
 	Monster(const string& name, int hp, int atkPwr) : name(name), hp(hp), atkPwr(atkPwr) {}
 };
 
-// ------------------------------------------------
-// PLAYER COMBAT ENUM
-// ------------------------------------------------
-enum PlayerAction {
-	ATTACK = 1,
-	BLOCK,
-	USE_ITEM,
-	EXIT
-};
-
-// ------------------------------------------------
-// COMBAT RESULT ENUM
-// ------------------------------------------------
-enum CombatResult {
-	PLAYER_WON,
-	PLAYER_DIED,
-	PLAYER_EXITED,
-};
-
-// ------------------------------------------------
-// ITEM ENUM
-// ------------------------------------------------
-enum Item {
-	HEALTH_POTION,
-	STRENGTH_ELIXIR
-};
-
 // -----------------------------------------------
 // FUNCTION PROTOTYPES
 // -----------------------------------------------
@@ -178,7 +189,7 @@ void applyDamage(Player& player, int damage);
 
 
 int main() {
-	srand(time(nullptr));
+	srand(static_cast<unsigned int>(time(nullptr)));
 
 	cout << "Welcome to this simple DnD like game!" << endl;
 	cout << "Please enter the name of your character: ";
@@ -249,7 +260,7 @@ int main() {
 				// If the player choose to explore the chamber then we give them a reward but also a consequence for taking something that wasn't theirs
 				cout << "You decide to explore the chamber and find a health potion hidden in a chest! But something in the shadows of the great chamber seems upset that you took something that wasn't yours. You are confronted by a Goblin!" << endl;
 				// We add the health potion to the player's inventory
-				player.addItem("Health Potion");
+				player.addItem(HEALTH_POTION);
 				// Here we would call a function to handle the combat between the player and the goblin
 				CombatResult combatResult = combat(player, goblin);
 				// After the combat we check to return type of the combat result 
@@ -317,7 +328,7 @@ int main() {
 				if (combatResult == PLAYER_WON) {
 					cout << "After your victory you take the shiny object off the orc and find that it was a strength elixir! You add it to your inventory and then you head to the next room..." << endl;
 					// Add the strength elix to the player's inventory 
-					player.addItem("Strength Elixer");
+					player.addItem(STRENGTH_ELIXIR);
 					// Then we move on to the next room 
 					currentRoom++;
 				}
@@ -333,8 +344,9 @@ int main() {
 				}
 				break;
 			}
+			}
 			break;
-		}
+		
 		// ------------------------------------------------ ROOM 3 ------------------------------------------------
 		case 3:
 			cout << "You enter the final room and face off against a powerful necromancer!" << endl;
