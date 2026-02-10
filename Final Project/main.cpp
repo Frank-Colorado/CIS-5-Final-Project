@@ -56,12 +56,15 @@ struct Player {
 	Item inventory[3] = {}; // Simple inventory with 3 slots
 	int inventorySize = 0; // Inventory starts empty
 
+	// Player constructor to initialize the player's name, HP, and attack power
 	Player(const string& name, int hp, int atkPwr) : name(name), hp(hp), atkPwr(atkPwr) {}
 
+	// Method to display the player's current stats
 	void displayStats() const {
 		cout << "You currently have " << hp << " HP and " <<atkPwr << " attack power." << endl;
 	}
 
+	// Helper method to convert an item enum value to a string for display purposes
 	string itemToString(const Item& item) const {
 		switch (item) {
 		case HEALTH_POTION:
@@ -73,6 +76,7 @@ struct Player {
 		}
 	}
 
+	// Method to add an item to the player's inventory
 	void addItem(const Item item) {
 		// Check the current inventory size before adding an item
 		if (inventorySize < 3) {
@@ -86,6 +90,7 @@ struct Player {
 
 	}
 
+	// Method to display the player's inventory
 	void displayInventory() const {
 
 		// Check to see if there are any items in the inventory before displaying
@@ -102,7 +107,7 @@ struct Player {
 		}
 
 		// Display final option for closing the inventory 
-		cout << "0: Close Inventory";
+		cout << "0: Close Inventory" << endl;
 	}
 
 	// Method to use items from the player's inventory 
@@ -118,7 +123,7 @@ struct Player {
 		displayInventory();
 
 		// Get the player's choice
-		cout << "Select the number of the item you want to use or 0 to close your inventory: ";
+		cout << "Select the number of the item you want to use or 0 to close your inventory: " << endl;
 		int choice; 
 		cin >> choice;
 
@@ -144,12 +149,14 @@ struct Player {
 			if (hp > 100) {
 				hp = 100;
 			};
+			cout << "You use a health potion and restore 50 HP!" << endl;
 			// Display the player's new stat total
 			displayStats();
 			break;
 		case STRENGTH_ELIXIR:
 			// If the selected item is a strength elixr then we add 20 points to their atk
 			atkPwr += 20;
+			cout << "You use a strength elixir and increase your attack power by 20!" << endl;
 			// Display the player's new stat total
 			displayStats();
 			break;
