@@ -267,7 +267,7 @@ int main() {
 				break;
 			case 5:
 				// If the player chooses to exit the game then we set gameOver to true to end the loop and end the game
-				cout << "You have chosen to exit the game. Thanks for playing!" << endl;
+				cout << "You have chosen to exit the game." << endl;
 				gameOver = true;
 				break;
 			default:
@@ -296,7 +296,7 @@ int main() {
 		}
 	}
 
-	cout << "Thanks for playing" << player.name << "!" << endl;
+	cout << "Thanks for playing " << player.name << "!" << endl;
 	return 0;
 }
 
