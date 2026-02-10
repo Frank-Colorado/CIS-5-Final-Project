@@ -238,8 +238,41 @@ int main() {
 // It takes 2 parameters
 // 1. A reference to the player object
 // 2. A reference to the monster object for the monster that the player is fighting
+// Since we are passing the player and monster by reference any changes made to their stats in this function will change the original objects that were passed in.
 void combat(Player& player, Monster& monster) {
+	// First we display the name and stats of the monster that the player is fighting
+	cout << "You are fighting a " << monster.name << "!" << endl;
 
+	// We start the combat loop and it continues as long as both the player and the monster are alive
+	while (player.hp > 0 && monster.hp > 0) {
+		// We display the player and monster's current stats at the start of each turn
+		cout << "Player HP: " << player.hp << " | Monster HP: " << monster.hp << endl;
+		// We give the player a choice of actions to take during their turn
+		cout << "Choose your action:" << endl;
+		cout << "1: Attack\n2: Block\n3: Use Item\n4: Exit Combat" << endl;
+
+		// Then we get the player's choice for what action they want to take during their turn
+		int actionChoice;
+		cin >> actionChoice;
+
+
+		switch (actionChoice) {
+		case ATTACK:
+		case BLOCK:
+		case USE_ITEM:
+		case EXIT:
+		default:
+			cout << "Invalid choice! Please select a valid action number." << endl;
+			break;
+		}
+
+		// After the player's turn we check to see if the monster is still alive. 
+		if (monster.hp > 0) {
+			// If the monster is still alive then it takes its turn to attack the player
+			cout << "The " << monster.name << " attacks you!" << endl;
+			player.hp -= monster.atkPwr; // The monster's attack power is subtracted from the player's HP
+		}
+		
+	}
 }
-
 
