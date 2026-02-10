@@ -127,7 +127,12 @@ int main() {
 	string playerName;
 	cin >> playerName;
 
+	// Create a player with the name entered by the user and default stats
 	Player player(playerName, 100, 20);
+	// Monsters for the player to fight
+	Monster goblin("Goblin", 50, 10);
+	Monster orc("Orc", 80, 15);
+	Monster Necromancer("Necromancer", 150, 25);
 
 	// intro dialogue displaying the player's name and stats
 	cout << "Welcome, " << player.name << "! You are a brave adventurer embarking on a quest." << endl;
