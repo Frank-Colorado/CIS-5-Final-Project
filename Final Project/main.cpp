@@ -121,6 +121,7 @@ struct Monster {
 
 
 int main() {
+	srand(time(nullptr));
 
 	cout << "Welcome to this simple DnD like game!" << endl;
 	cout << "Please enter the name of your character: ";
@@ -132,15 +133,85 @@ int main() {
 	// Monsters for the player to fight
 	Monster goblin("Goblin", 50, 10);
 	Monster orc("Orc", 80, 15);
-	Monster Necromancer("Necromancer", 150, 25);
+	Monster necromancer("Necromancer", 150, 25);
 
 	// intro dialogue displaying the player's name and stats
 	cout << "Welcome, " << player.name << "! You are a brave adventurer embarking on a quest." << endl;
 	player.displayStats();
 
+	// Dialogue for entering the crypt
+	cout << "You find yourself standing in front of a dark and ominous crypt. Do you wish to enter? (yes/no) ";
+	string choice;
+	cin >> choice;
 
-	
+	// If the player chooses to enter the crypt then we start the game
+	if (choice == "yes") {
+		cout << "You step into the crypt and the door slams shut behind you. You are now trapped inside!" << endl;
+	}
+	else {
+		cout << "You decide to stay outside and miss out on the adventure that awaits inside the crypt." << endl;
+		return 0; // End the game if the player chooses not to enter the crypt
+	}
 
+	// Dungeon gameplay loop
+	// First we start by setting the current room the player is in to 1
+	int currentRoom = 1;
+	// We also create a boolean variable to track whether the game is over or not.
+	bool gameOver = false;
+
+	// We start the game loop and it continues as long as the game is not over
+	while (!gameOver) {
+		// We use a switch statement to determine what happens in each room based on the current room number
+		switch (currentRoom) {
+		case 1:
+			// Here we initiate the first room of the dungeon and give the player a choice to either explore the chamber or head down the hallway
+			cout << "You enter a large dark and musty chamber. In front of you looms a long and narrow hallway. Do you choose to head down the hallway or explore the chamber first?" << endl;
+			cout << "1: Move down the hallway\n2: Explore the chamber" << endl;
+			// We get the player's choice for what they want to do in the first room
+			int roomChoice;
+			cin >> roomChoice;
+			// If the player chooses to head down the hallway then we move them to the next room.
+			if (roomChoice == 1) {
+				cout << "You cautiously make your way down the hallway..." << endl;
+				currentRoom++; // Move to the next room
+			} else if (roomChoice == 2) {
+				// If the player choose to explore the chamber then we give them a reward but also a consequence for taking something that wasn't theirs
+				cout << "You decide to explore the chamber and find a health potion hidden in a chest! But something in the shadows of the great chamber seems upset that you took something that wasn't yours. You are confronted by a Goblin!" << endl;
+				// We add the health potion to the player's inventory
+				player.addItem("Health Potion"); 
+				// Here we would call a function to handle the combat between the player and the goblin
+				// After the combat we check to see if the player is still alive 
+				if (player.hp <= 0) {
+					cout << "You have been defeated by the goblin! Game Over." << endl;
+					gameOver = true; // End the game if the player has been defeated) 
+				}
+				else {
+					// If the player is still alive then we move them to the next room
+					cout << "You have defeated the goblin and continue on to the next room." << endl;
+					currentRoom++;
+				}
+			}
+			break;
+		case 2:
+			cout << "You enter the second room and are confronted by an orc!" << endl;
+			// Here we would call a function to handle the combat between the player and the orc
+			currentRoom++;
+			break;
+		case 3:
+			cout << "You enter the final room and face off against a powerful necromancer!" << endl;
+			// Here we would call a function to handle the combat between the player and the necromancer
+			// If the player wins then they have completed the game and we set gameOver to true to end the loop
+			gameOver = true;
+			break;
+		default:
+			// If the current room number does not match any of the cases then we end the game 
+			cout << "You have exited the dungeon<" << endl;
+			gameOver = true; // End the game if there is an invalid room number
+			break;
+		}
+	}
+
+	cout << "Thanks for playing" << player.name << "!" << endl;
 	return 0;
 }
 
