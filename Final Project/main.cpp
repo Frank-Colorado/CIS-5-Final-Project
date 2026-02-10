@@ -6,6 +6,9 @@
 
 using namespace std;
 
+// ------------------------------------------------
+// PLAYER STRUCTURE
+// ------------------------------------------------
 struct Player {
 	string name;
 	int hp;
@@ -108,7 +111,9 @@ struct Player {
 
 };
 
-// Monster struct with name, hp, and attack power
+// ------------------------------------------------
+// MONSTER STRUCTURE
+// ------------------------------------------------
 struct Monster {
 	string name;
 	int hp;
@@ -116,7 +121,21 @@ struct Monster {
 	Monster(const string& name, int hp, int atkPwr) : name(name), hp(hp), atkPwr(atkPwr) {}
 };
 
-// Function prototypes
+// -----------------------------------------------
+// FUNCTION PROTOTYPES
+// -----------------------------------------------
+void combat(Player& player, Monster& monster);
+
+// ------------------------------------------------
+// PLAYER COMBAT ENUM
+// ------------------------------------------------
+enum PlayerAction {
+	ATTACK = 1,
+	BLOCK,
+	USE_ITEM,
+	EXIT
+};
+
 
 
 
@@ -213,6 +232,14 @@ int main() {
 
 	cout << "Thanks for playing" << player.name << "!" << endl;
 	return 0;
+}
+
+// This function will handle the combat between the player and a monster.
+// It takes 2 parameters
+// 1. A reference to the player object
+// 2. A reference to the monster object for the monster that the player is fighting
+void combat(Player& player, Monster& monster) {
+
 }
 
 
