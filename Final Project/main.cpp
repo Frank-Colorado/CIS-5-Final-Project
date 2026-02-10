@@ -281,7 +281,6 @@ int main() {
 				}
 				break;
 			}
-		
 			case 3: 
 				// If the player chooses to check stats then we call displayStats method
 				player.displayStats();
@@ -306,7 +305,7 @@ int main() {
 
 		// ------------------------------------------------ ROOM 2 ------------------------------------------------
 		case 2:
-			cout << "After traversing the long, narrow hallway you enter a dimly lit room. As your stomble around the room you find your self face to face with a large orc!" << endl;
+			cout << "After traversing the long, narrow hallway you enter a dimly lit room. As your stumble around the room you find your self face to face with a large orc!" << endl;
 			cout << "You realize the orc seems to be holding something shiny that you might want." << endl;
 			cout << "You could challenge the orc and take what it's holding for yourself or you could use the darkness of the room to flee but you might not escape unscathed.";
 			cout << "1: Challenge the orc for the shiny object." << endl;
@@ -342,8 +341,97 @@ int main() {
 					cout << "You have fled from combat and abandoned your quest. Game Over." << endl;
 					gameOver = true;
 				}
-				break;
 			}
+				  break;
+			case 2: {
+				cout << "You bring your body low to the ground and cloak yourself in the darkness of the room. You attempt to slip past the orc but he catches you with a blow to the side." << endl;
+				// Here we roll a D20 to check how much dmg the player takes from the orc's attack as they try to flee
+				// We will also use this roll to see if the blow was a critical hit (15 or higher) or if it was a critical fail (5 or lower)
+				int fleeRoll = rollD20();
+				// If the flee roll is 15 or higher then we consider that a critical hit.
+				// The player will take the damage and be caught by the orc and forced into combat.
+				if (fleeRoll >= 15) {
+					cout << "Critical Hit! The orc's blow is especially powerful and knocks you to the ground. Now you have no way to escape and have to fight to survive!" << endl;
+					// We calculate the damage the orc deals to the player by rolling a D20 and adding the orc's attack power.
+					int orcDmg = rollD20() + orc.atkPwr;
+					// Then we subtract that damage from the player's HP. 
+					applyDamage(player, orcDmg);
+					// After the player takes damage from the orc's attack then we check to see if they are still alive. 
+					if (player.hp > 0) {
+						// If the player is still alive then we call the combat function to handle the combat between the player and the orc
+						CombatResult combatResult = combat(player, orc);
+						// After the combat we check to return type of the combat result
+						if (combatResult == PLAYER_WON) {
+							cout << "After your victory you take the shiny object off the orc and find that it was a strength elixir! You add it to your inventory and then you head to the next room..." << endl;
+							// Add the strength elix to the player's inventory 
+							player.addItem(STRENGTH_ELIXIR);
+							// Then we move on to the next room 
+							currentRoom++;
+						}
+						else if (combatResult == PLAYER_DIED) {
+							// If the player died in combat then we tell the player that they have died and end the game by setting gameOver to true
+							cout << "You have died in combat to the " << orc.name << " . Game Over." << endl;
+							gameOver = true;
+						}
+						else if (combatResult == PLAYER_EXITED) {
+							// If the player chose to exit combat then we tell the player that they have fled and abandoned their quest and end the game by setting gameOver to true
+							cout << "You have fled from combat and abandoned your quest. Game Over." << endl;
+							gameOver = true;
+						}
+					}
+					else {
+						// If the player is not alive after taking damage from trying to flee then we tell them that they have died and end the game by setting gameOver to true
+						cout << "The blow from the orc was too much for you and you died as you tried to flee. Game Over." << endl;
+						gameOver = true;
+					}
+				} else if (fleeRoll <= 5) {
+						// If the flee roll is 5 or lower then we consider that a critical fail. 
+						// The player takes no damage from the orc and they are able to swipe the shiny object off its waist in the process
+						cout << "Critical Miss! Your dexterity is unmatched and the orc's blow slides of your body as if you were darkness iteself." << endl;
+						cout << "The orc stumbles after his failed attack and you use this opportunity to swipe the shiny object off his waist! You find that it was a strength elixir and you add it to your inventory." << endl;
+						player.addItem(STRENGTH_ELIXIR);
+						cout << "You successfully flee to the next room and leave the confused orc behind you..." << endl;
+						currentRoom++;
+				} else {
+					// If the flee roll is between 6 and 14 then we consider that a normal attempt to flee. The player takes damage from the orc's attack but they are able to escape and flee to the next room
+					cout << "You take the hit from the orc and lose your footing." << endl;
+					// We calculate the damage the orc deals to the player by rolling a D20 and adding the orc's attack power.
+					int orcDmg = rollD20() + orc.atkPwr;
+					// Then we subtract that damage from the player's HP.
+					applyDamage(player, orcDmg);
+					// After the player takes damage from the orc's attack then we check to see if they are still alive.
+					if (player.hp > 0) {
+						cout << "The damage wasn't enough to bring you down and you successfully flee to the next room and leave the orc behind you..." << endl;
+						currentRoom++;
+					}
+					else {
+						// If the player is not alive after taking damage from trying to flee then we tell them that they have died and end the game by setting gameOver to true
+						cout << "The blow from the orc was too much for you and you died as you tried to flee. Game Over." << endl;
+						gameOver = true;
+					}
+				}
+			}
+			break;
+			case 3:
+				// If the player chooses to check stats then we call displayStats method
+				player.displayStats();
+				// Since the player is still in the same room we don't change the current room number and we just break and the previous switch statement will run again with the same room options for the player to choose from
+				break;
+			case 4:
+				// If the player chooses to check their inventory then we call the useItem method which will display the player's inventory and allow them to use an item if they choose to
+				player.useItem();
+				// Again we break without changing the current room number
+				break;
+				break;
+			case 5: 
+				// If the player chooses to exit the game then we set gameOver to true to end the loop and end the game
+				cout << "You have chosen to exit the game." << endl;
+				gameOver = true;
+				break;
+			default:
+				// If the player enters an invalid choice then we display an error message
+				cout << "Invalid choice! Please select a valid option number." << endl;
+				break;
 			}
 			break;
 		
