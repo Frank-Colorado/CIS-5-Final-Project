@@ -4,7 +4,18 @@
 #include <string>
 #include <ctime>
 
-using namespace std;
+using std::cout;
+using std::cin;
+using std::string;
+using std::endl;
+using std::setw;
+using std::left;
+using std::right;
+using std::fixed;
+using std::setprecision;
+using std::srand;
+using std::rand;
+using std::time;
 
 // ------------------------------------------------
 // PLAYER STRUCTURE
@@ -92,7 +103,7 @@ struct Player {
 				hp = 100;
 			};
 			// Display the player's new stat total
-			displayStats()
+			displayStats();
 		}
 		else if (selectedItem == "Strength Elixir") {
 			// If the selected item is a strength elixr then we add 20 points to their atk
@@ -121,12 +132,6 @@ struct Monster {
 	Monster(const string& name, int hp, int atkPwr) : name(name), hp(hp), atkPwr(atkPwr) {}
 };
 
-// -----------------------------------------------
-// FUNCTION PROTOTYPES
-// -----------------------------------------------
-void combat(Player& player, Monster& monster);
-int rollDmg();
-
 // ------------------------------------------------
 // PLAYER COMBAT ENUM
 // ------------------------------------------------
@@ -136,6 +141,21 @@ enum PlayerAction {
 	USE_ITEM,
 	EXIT
 };
+
+// ------------------------------------------------
+// COMBAT RESULT ENUM
+// ------------------------------------------------
+enum CombatResult {
+	PLAYER_WON,
+	PLAYER_DIED,
+	PLAYER_EXITED,
+};
+
+// -----------------------------------------------
+// FUNCTION PROTOTYPES
+// -----------------------------------------------
+CombatResult combat(Player& player, Monster& monster);
+int rollDmg();
 
 
 
@@ -185,31 +205,68 @@ int main() {
 		switch (currentRoom) {
 		case 1:
 			// Here we initiate the first room of the dungeon and give the player a choice to either explore the chamber or head down the hallway
+			// We also give the player the basic options to check their stats, inventory, or exit the game
+			// Because we are giving so many options for a player to choose from in each room we will use nested switch statements to handle the logic for each choice.
 			cout << "You enter a large dark and musty chamber. In front of you looms a long and narrow hallway. Do you choose to head down the hallway or explore the chamber first?" << endl;
-			cout << "1: Move down the hallway\n2: Explore the chamber" << endl;
-			// We get the player's choice for what they want to do in the first room
+			cout << "1: Move down the hallway" << endl;
+			cout << "2: Explore the chamber" << endl;
+			cout << "3. Current Stats" << endl;
+			cout << "4. Inventory" << endl;
+			cout << "5. Exit Game" << endl;
+
+			// Here we get the player's choice for what they want to do in the first room
 			int roomChoice;
 			cin >> roomChoice;
-			// If the player chooses to head down the hallway then we move them to the next room.
-			if (roomChoice == 1) {
+
+			switch (roomChoice) {
+			case 1:
+				// If the player chooses to head down the hallway then we move to the next room 
+				// No rewards or consequences for choosing this option
 				cout << "You cautiously make your way down the hallway..." << endl;
 				currentRoom++; // Move to the next room
-			} else if (roomChoice == 2) {
+				break;
+			case 2:
 				// If the player choose to explore the chamber then we give them a reward but also a consequence for taking something that wasn't theirs
 				cout << "You decide to explore the chamber and find a health potion hidden in a chest! But something in the shadows of the great chamber seems upset that you took something that wasn't yours. You are confronted by a Goblin!" << endl;
 				// We add the health potion to the player's inventory
-				player.addItem("Health Potion"); 
+				player.addItem("Health Potion");
 				// Here we would call a function to handle the combat between the player and the goblin
-				// After the combat we check to see if the player is still alive 
-				if (player.hp <= 0) {
-					cout << "You have been defeated by the goblin! Game Over." << endl;
-					gameOver = true; // End the game if the player has been defeated) 
-				}
-				else {
-					// If the player is still alive then we move them to the next room
-					cout << "You have defeated the goblin and continue on to the next room." << endl;
+				CombatResult combatResult = combat(player, goblin);
+				// After the combat we check to return type of the combat result 
+				if (combatResult == PLAYER_WON) {
+					// If the player won the combat then we move to the next room
 					currentRoom++;
 				}
+				else if (combatResult == PLAYER_DIED) {
+					// If the player died in combat then we tell the player that they have died and end the game by setting gameOver to true
+					cout << "You have died in combat to the " << goblin.name << " . Game Over." << endl;
+					gameOver = true;
+				}
+				else if (combatResult == PLAYER_EXITED) {
+					// If the player chose to exit combat then we tell the player that they have fled and abandoned their quest and end the game by setting gameOver to true
+					cout << "You have fled from combat and abandoned your quest. Game Over." << endl;
+					gameOver = true;
+				}
+				break;
+			case 3: 
+				// If the player chooses to check stats then we call displayStats method
+				player.displayStats();
+				// Since the player is still in the same room we don't change the current room number and we just break and the previous switch statement will run again with the same room options for the player to choose from
+				break;
+			case 4:
+				// If the player chooses to check their inventory then we call the useItem method which will display the player's inventory and allow them to use an item if they choose to
+				player.useItem();
+				// Again we break without changing the current room number
+				break;
+			case 5:
+				// If the player chooses to exit the game then we set gameOver to true to end the loop and end the game
+				cout << "You have chosen to exit the game. Thanks for playing!" << endl;
+				gameOver = true;
+				break;
+			default:
+				// If the player enters an invalid choice then we display an error message
+				cout << "Invalid choice! Please select a valid option number." << endl;
+				break;
 			}
 			break;
 		case 2:
@@ -245,12 +302,17 @@ int rollDmg() {
 // 1. A reference to the player object
 // 2. A reference to the monster object for the monster that the player is fighting
 // Since we are passing the player and monster by reference any changes made to their stats in this function will change the original objects that were passed in.
-void combat(Player& player, Monster& monster) {
+CombatResult combat(Player& player, Monster& monster) {
+	// Create a variable to track the result of the combat and initialize it to PLAYER_EXITED. This is because if the player chooses to exit combat then we will return this result and end the combat loop.
+	CombatResult result = PLAYER_EXITED;
+	// We also create a boolean variable to track if the combat is over or not and initialize it to false. This is because the combat loop will continue until the combat is over.
+	bool combatOver = false;
+
 	// First we display the name and stats of the monster that the player is fighting
 	cout << "You are fighting a " << monster.name << "!" << endl;
 
 	// We start the combat loop and it continues as long as both the player and the monster are alive
-	while (player.hp > 0 && monster.hp > 0) {
+	while (!combatOver && player.hp > 0 && monster.hp > 0) {
 		// We display the player and monster's current stats at the start of each turn
 		cout << "Player HP: " << player.hp << " | Monster HP: " << monster.hp << endl;
 		// We give the player a choice of actions to take during their turn
@@ -264,9 +326,25 @@ void combat(Player& player, Monster& monster) {
 
 		switch (actionChoice) {
 		case ATTACK:
+		// If the player chooses to attack then we calculate the damage they deal the monster by rolling a 20 sided die
+		// Then we add the player's attack power to the damage rolled 
+			int playerDmg = rollDmg() + player.atkPwr;
+			// We subtract the damage dealt from the monster's HP
+			monster.hp -= playerDmg;
+			// Then we print out the damage dealt to the monster
+			cout << "You attack the " << monster.name << " and deal " << playerDmg << " damage!" << endl;
+			break;
 		case BLOCK:
 		case USE_ITEM:
+		// If the player chooses to use an item then we call the useItem method from the Player structure 
+			player.useItem();
+			break;
 		case EXIT:
+		// If the player chooses to exit combat then we set combatOver to true to end the combat loop and we return the result of PLAYER_EXITED
+			cout << "You have chosen to exit combat." << endl;
+			combatOver = true;
+			result = PLAYER_EXITED;
+			break;
 		default:
 			cout << "Invalid choice! Please select a valid action number." << endl;
 			break;
@@ -280,5 +358,17 @@ void combat(Player& player, Monster& monster) {
 		}
 		
 	}
+
+	// After the combat loop we check to see if the player is still alive and if so we return that they won the combat. If the player is not alive then we return that they died in combat. If the player chose to exit combat then we return that they exited combat.
+	if (player.hp > 0) {
+		cout << "You have defeated the " << monster.name << "!" << endl;
+		result = PLAYER_WON;
+	}
+	else {
+		cout << "You have been defeated by the " << monster.name << "! Game Over." << endl;
+		result = PLAYER_DIED;
+	}
+
+	return result;
 }
 
