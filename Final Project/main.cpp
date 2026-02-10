@@ -108,6 +108,14 @@ struct Player {
 
 };
 
+// Monster struct with name, hp, and attack power
+struct Monster {
+	string name;
+	int hp;
+	int atkPwr;
+	Monster(const string& name, int hp, int atkPwr) : name(name), hp(hp), atkPwr(atkPwr) {}
+};
+
 // Function prototypes
 
 
