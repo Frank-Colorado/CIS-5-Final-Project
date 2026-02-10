@@ -125,6 +125,7 @@ struct Monster {
 // FUNCTION PROTOTYPES
 // -----------------------------------------------
 void combat(Player& player, Monster& monster);
+int rollDmg();
 
 // ------------------------------------------------
 // PLAYER COMBAT ENUM
@@ -232,6 +233,11 @@ int main() {
 
 	cout << "Thanks for playing" << player.name << "!" << endl;
 	return 0;
+}
+
+// This function will roll a 20 sided die and return the result as an integer. 
+int rollDmg() {
+	return rand() % 20 + 1; // Generate a random number between 1 and 20
 }
 
 // This function will handle the combat between the player and a monster.
