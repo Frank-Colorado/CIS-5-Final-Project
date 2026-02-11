@@ -51,6 +51,7 @@ enum Item {
 struct Player {
 	string name;
 	int hp;
+	int maxHp = 150; // Max HP that the player can have. This is used to prevent the player's HP from exceeding 100 when they use a health potion.
 	int atkPwr;
 	int block = 0; // Block stat that can be increased by using a block action in combat. I set it to 0 by default and I will reset it to 0 at the end of each combat.
 	Item inventory[3] = {}; // Simple inventory with 3 slots
@@ -145,10 +146,10 @@ struct Player {
 		switch (selectedItem) {
 		case HEALTH_POTION:
 			hp += 50; // Heal the player by 50 HP
-			// I don't want the player's HP to exceed 100 so I check to see if it does and if so I set it back to 100
-			if (hp > 100) {
-				hp = 100;
-			};
+			// I don't want the player's HP to exceed 100 so I check the player's current HP after using the hp pot and if it exceeds the current max HP then I set it to the max HP
+			if (hp > maxHp) {
+				hp = maxHp;
+			}
 			cout << "You use a health potion and restore 50 HP!" << endl;
 			// Display the player's new stat total
 			displayStats();
@@ -204,7 +205,7 @@ int main() {
 	cin >> playerName;
 
 	// Create a player with the name entered by the user and default stats
-	Player player(playerName, 100, 20);
+	Player player(playerName, 150, 20);
 	// Monsters for the player to fight
 	Monster goblin("Goblin", 50, 10);
 	Monster orc("Orc", 80, 15);
@@ -429,7 +430,6 @@ int main() {
 				player.useItem();
 				// Again we break without changing the current room number
 				break;
-				break;
 			case 5: 
 				// If the player chooses to exit the game then we set gameOver to true to end the loop and end the game
 				cout << "You have chosen to exit the game." << endl;
@@ -444,11 +444,102 @@ int main() {
 		
 		// ------------------------------------------------ ROOM 3 ------------------------------------------------
 		case 3:
-			cout << "You enter the final room and face off against a powerful necromancer!" << endl;
-			// Here we would call a function to handle the combat between the player and the necromancer
-			// If the player wins then they have completed the game and we set gameOver to true to end the loop
-			gameOver = true;
+			cout << "You find yourself now in a grand hall. The ceiling of the room almost seems to disapear into the darkness. The air in the room itself seems to fill you with a feeling of reverance but you're not sure for what." << endl;
+			cout << "In the center of the room looms an altar that seems to pull you in with its presence." << endl;
+			cout << "You approach the altar and you feel it whispering to you. Urging you to offer up a prayer. What do you decide to do?" << endl;
+			cout << "1. You pray to the altar." << endl;
+			cout << "2. This thing creeps you out so decide to leave the room as fast as you can." << endl;
+			cout << "3. Currents Stats" << endl;
+			cout << "4. Inventory" << endl;
+			cout << "5. Exit Game" << endl;
+
+			// We get the player's choice for this room 
+			int room3choice;
+			cin >> room3choice;
+
+			// ----------------------------------------------- ROOM 3 CHOICES ------------------------------------------------
+			switch (room3choice) {
+			case 1: {
+				cout << "You kneel before the altar and whisper a prayer. You can somehow feel the altar's attention fixated on you as you pray." << endl;
+				// If the player chooses to pray to the altar then we roll a D20 to see what the result of their prayer is.
+				int prayerRoll = rollD20();
+				// If the prayer roll is 14 or higher then we consider that the player has received a blessing from the altar. The player's HP and attack power are both increased by 20 points.
+				if (prayerRoll >= 14) {
+					cout << "As you pray, the words seem to come from someone-or something-else entirely. They are not your own, yet they fall from your lips with absolute certainty. Almost as if they have been placed there" << endl;
+					cout << "As you conclude your prayer, the very air around you seems to grin. Power floods through your body. You feel...Stronger. Faster. Better. Yet somewhere, deep within you, you sense an absence-you are no longer whole." << endl;
+
+					// The player's max hp is reduced by 10 point as the price for their reward
+					player.maxHp -= 10;
+					// The player restores their HP to full 
+					player.hp = player.maxHp;
+					// The player get a boost of 20 points to their attack power
+					player.atkPwr += 20;
+					// Display the player's new stat total
+					player.displayStats();
+					// The player moves on to the next room 
+					cout << "With this newfound power you feel ready to face whatever lies ahead. You head to the next room..." << endl;
+					currentRoom++;
+				}
+				else if (prayerRoll <= 7) {
+					cout << "You attemp to pray, but the words stumble as they leave your lips. They feel hollow. They feel unworthy." << endl;
+					cout << "When you finish, A sharp pain sears through your skull. The altar has heard your prayer... and found you lacking." << endl;
+
+					// The player is cursed by the altar and loses 10 point to their max hp and 10 points to their attack power
+					player.maxHp -= 10;
+					player.atkPwr -= 10;
+					// Display the player's new stat total
+					player.displayStats();
+					// The player moves on to the next room
+					cout << "Feeling shaken and frail from the altar's curse you decide to move on to the next room..." << endl;
+					currentRoom++;
+				}
+				else {
+					// If the prayer roll is between 8 and 13 then we consider that the altar is indifferent to the player. The player receives no blessings or curses and their stats remain unchanged.
+					cout << "You offer your prayer, but nothing stirs. The altar remains silent, its presence cold and distant. Whatever listens here does not answer." << endl;
+					// display the player's current stat total
+					player.displayStats();
+					// The player moves on to the next room
+					cout << "Though you aren't sure what you expected, you decide its best to move on to the next room..." << endl;
+				}
+			}
+				break;
+			case 2: 
+				// If the player chooses to leave the room then the player gets a hp pot and moves on
+				cout << "You decide not to tempt fate and shut out the altar's whispers. Your head becomes clearer and your thoughts become your own again. You realize that there is a health potion on a pedestal next to the altar." << endl;
+				cout << "You take the health potion and add it to your inventory and then you head to the next room..." << endl;
+				// Add the health potion to the player's inventory
+				player.addItem(HEALTH_POTION);
+				// Move to the next room
+				currentRoom++;
+				break;
+			case 3:
+				// If the player chooses to check stats then we call displayStats method
+				player.displayStats();
+				// Since the player is still in the same room we don't change the current room number and we just break and the previous switch statement will run again with the same room options for the player to choose from
+				break;
+			case 4:
+				// If the player chooses to check their inventory then we call the useItem method which will display the player's inventory and allow them to use an item if they choose to
+				player.useItem();
+				// Again we break without changing the current room number
+				break;
+			case 5: 
+				// If the player chooses to exit the game then we set gameOver to true to end the loop and end the game
+				cout << "You have chosen to exit the game." << endl;
+				gameOver = true;
+				break;
+			default: 
+				// If the player enters an invalid choice then we display an error message
+				cout << "Invalid choice! Please select a valid option number." << endl;
+				break;
+			}
 			break;
+		// ------------------------------------------------ ROOM 4 ------------------------------------------------
+		case 4:
+			break;
+		// ------------------------------------------------ ROOM 5 ------------------------------------------------
+		case 5:
+			break;
+		// ------------------------------------------------ DEFAULT ------------------------------------------------
 		default: {
 			// If the current room number does not match any of the cases then we end the game 
 			cout << "You have exited the dungeon<" << endl;
