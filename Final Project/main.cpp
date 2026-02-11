@@ -486,7 +486,11 @@ int main() {
 
 					// The player is cursed by the altar and loses 10 point to their max hp and 10 points to their attack power
 					player.maxHp -= 10;
-					player.atkPwr -= 10;
+					// Set the player's current HP to the new max HP if their current HP exceeds the new max HP after the curse is applied
+					// Otherwise we can just leave their hp as it is because the curse only reduces the player's max HP 
+					if (player.hp > player.maxHp) {
+						player.hp = player.maxHp;
+					}
 					// Display the player's new stat total
 					player.displayStats();
 					// The player moves on to the next room
@@ -500,6 +504,7 @@ int main() {
 					player.displayStats();
 					// The player moves on to the next room
 					cout << "Though you aren't sure what you expected, you decide its best to move on to the next room..." << endl;
+					currentRoom++;
 				}
 			}
 				break;
@@ -535,9 +540,11 @@ int main() {
 			break;
 		// ------------------------------------------------ ROOM 4 ------------------------------------------------
 		case 4:
+			gameOver = true; // End the game after the final room
 			break;
 		// ------------------------------------------------ ROOM 5 ------------------------------------------------
 		case 5:
+			gameOver = true; // End the game after the final room
 			break;
 		// ------------------------------------------------ DEFAULT ------------------------------------------------
 		default: {
