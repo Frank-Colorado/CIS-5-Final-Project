@@ -465,7 +465,7 @@ int main() {
 				int prayerRoll = rollD20();
 				// If the prayer roll is 14 or higher then we consider that the player has received a blessing from the altar. The player's HP and attack power are both increased by 20 points.
 				if (prayerRoll >= 14) {
-					cout << "As you pray, the words seem to come from someone-or something-else entirely. They are not your own, yet they fall from your lips with absolute certainty. Almost as if they have been placed there" << endl;
+					cout << "As you pray, the words seem to come from someone-or something-else entirely. They are not your own, yet they fall from your lips with absolute certainty. Almost as if they have been placed there." << endl;
 					cout << "As you conclude your prayer, the very air around you seems to grin. Power floods through your body. You feel...Stronger. Faster. Better. Yet somewhere, deep within you, you sense an absence-you are no longer whole." << endl;
 
 					// The player's max hp is reduced by 10 point as the price for their reward
