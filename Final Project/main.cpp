@@ -348,7 +348,7 @@ int main() {
 			// ----------------------------------------------- ROOM 2 CHOICES ------------------------------------------------
 			switch (room2Choice) {
 			case 1: {
-				cout << "You decide to challenge the ghoul for the shiny object. You engage in combat with the orc!" << endl;
+				cout << "You decide to challenge the ghoul for the shiny object. You engage in combat with the ghoul!" << endl;
 				// Here we call the function to handle the combat between the player and the orc
 				CombatResult combatResult = combat(player, ghoul);
 				// After the combat we check to return type of the combat result
@@ -502,7 +502,7 @@ int main() {
 					currentRoom++;
 				}
 				else if (prayerRoll <= 7) {
-					cout << "You attemp to pray, but the words stumble as they leave your lips. They feel hollow. They feel unworthy." << endl;
+					cout << "You attempt to pray, but the words stumble as they leave your lips. They feel hollow. They feel unworthy." << endl;
 					cout << "When you finish, A sharp pain sears through your skull. The altar has heard your prayer... and found you lacking." << endl;
 
 					// The player is cursed by the altar and loses 10 point to their max hp and 5 points to their attack power
@@ -866,29 +866,29 @@ CombatResult combat(Player& player, Monster& monster) {
 			break;
 		}
 
-		// After the player's turn we check to see if the monster is still alive. 
-		if (monster.hp > 0) {
-			// We calculate the damage the monster deals to the player by rolling a D20 and adding the monster's attack power
-			int monsterDmg = rollD20() + monster.atkPwr;
-			// Then we print out the damage that the monster is trying to deal to the player
-			cout << "The " << monster.name << " attacks you for " << monsterDmg << " damage!" << endl;
-			// Then we call the applyDamage function to apply the damage to the player
-			applyDamage(player, monsterDmg);
+		// After the player's turn we check to see if the monster died
+		if (monster.hp <= 0) {
+			// If the monster's HP is 0 or less then we set combatOver to true to end the combat loop and we return the result of PLAYER_WON
+			combatOver = true;
+			result = PLAYER_WON;
+			continue; // Skip the rest of the loop and go to the next iteration which will check the while loop condition and break since combatOver is now true
 		}
-		// After the monster's turn the while loop will check again to see if both the player and monster are still alive and if combatOver is still false.
-		// If any of those conditions are false then the combat loop will break and we will check the result of the combat to see if the player won, died, or exited combat.
-	}
 
-	// After the combat loop we check to see if the player is still alive and if so we return that they won the combat. If the player is not alive then we return that they died in combat. If the player chose to exit combat then we return that they exited combat.
-	if (player.hp > 0) {
-		cout << "You have defeated the " << monster.name << "!" << endl;
-		result = PLAYER_WON;
-	}
-	else {
-		cout << "You have been defeated by the " << monster.name << "! Game Over." << endl;
-		result = PLAYER_DIED;
+		// Since the monster is still alive after the player's turn, it's now the monster's turn to attack the player.
+		// We calculate the damage the monster deals to the player by rolling a D20 and adding the monster's attack power
+		int monsterDmg = rollD20() + monster.atkPwr;
+		// Then we print out the damage that the monster is trying to deal to the player
+			cout << "The " << monster.name << " attacks you for " << monsterDmg << " damage!" << endl;
+		// Then we call the applyDamage function to apply the damage to the player
+		applyDamage(player, monsterDmg);
+
+		// After the monster's attack we check to see if the player died
+		if (player.hp <= 0) {
+			// If the player's HP is 0 or less then we set combatOver to true to end the combat loop and we return the result of PLAYER_DIED
+			combatOver = true;
+			result = PLAYER_DIED;
+			continue; // Skip the rest of the loop and go to the next iteration which will check the while loop condition and break since combatOver is now true
 	}
 
 	return result;
 }
-
