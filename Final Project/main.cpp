@@ -9,10 +9,10 @@ using std::cin;
 using std::string;
 using std::endl;
 using std::setw;
+using std::setfill;
 using std::left;
 using std::right;
 using std::fixed;
-using std::setprecision;
 using std::srand;
 using std::rand;
 using std::time;
@@ -246,7 +246,9 @@ int main() {
 			// Here we initiate the first room of the dungeon and give the player a choice to either explore the chamber or head down the hallway
 			// We also give the player the basic options to check their stats, inventory, or exit the game
 			// Because we are giving so many options for a player to choose from in each room we will use nested switch statements to handle the logic for each choice.
-			cout << "You enter a large dark and musty chamber. In front of you looms a long and narrow hallway. Do you choose to head down the hallway or explore the chamber first?" << endl;
+			// Visual border
+			cout << setfill('-') << setw(120) << "" << setfill(' ') << endl;
+			cout << "You enter a large dark and musty chamber. In front of you looms a long and narrow hallway.\nDo you choose to head down the hallway or explore the chamber first?" << endl;
 			cout << "1: Move down the hallway" << endl;
 			cout << "2: Explore the chamber" << endl;
 			cout << "3. Current Stats" << endl;
@@ -267,7 +269,7 @@ int main() {
 				break;
 			case 2: {
 				// If the player choose to explore the chamber then we give them a reward but also a consequence for taking something that wasn't theirs
-				cout << "You decide to explore the chamber and find a health potion hidden in a chest! But something in the shadows of the great chamber seems upset that you took something that wasn't yours. You are confronted by a Phantom!" << endl;
+				cout << "You decide to explore the chamber and find a health potion hidden in a chest!\nBut something in the shadows of the great chamber seems upset that you took something that wasn't yours.\nYou are confronted by a Phantom!" << endl;
 				// We add the health potion to the player's inventory
 				player.addItem(HEALTH_POTION);
 				// Here we would call a function to handle the combat between the player and the goblin
@@ -314,8 +316,9 @@ int main() {
 
 		// ------------------------------------------------ ROOM 2 ------------------------------------------------
 		case 2:
+			cout << setfill('-') << setw(120) << "" << setfill(' ') << endl;
 			cout << "After traversing the long, narrow hallway you enter a dimly lit room. As your stumble around the room you find your self face to face with a ghoul!" << endl;
-			cout << "You realize the orc seems to be holding something shiny that you might want." << endl;
+			cout << "You realize the ghoul seems to be holding something shiny that you might want." << endl;
 			cout << "You could challenge the ghoul and take what it's holding for yourself or you could use the darkness of the room to flee but you might not escape unscathed.";
 			cout << "1: Challenge the ghoul for the shiny object." << endl;
 			cout << "2. Make a run for it!" << endl;
@@ -396,7 +399,7 @@ int main() {
 				} else if (fleeRoll <= 5) {
 						// If the flee roll is 5 or lower then we consider that a critical fail. 
 						// The player takes no damage from the orc and they are able to swipe the shiny object off its waist in the process
-						cout << "Critical Miss! Your dexterity is unmatched and the ghoul's blow slides of your body as if you were darkness iteself." << endl;
+						cout << "Critical Miss! Your dexterity is unmatched and the ghoul's blow slides off your body as if you were darkness iteself." << endl;
 						cout << "The ghoul stumbles after his failed attack and you use this opportunity to swipe the shiny object off his waist! You find that it was a strength elixir and you add it to your inventory." << endl;
 						player.addItem(STRENGTH_ELIXIR);
 						cout << "You successfully flee to the next room and leave the confused ghoul behind you..." << endl;
@@ -445,6 +448,7 @@ int main() {
 		
 		// ------------------------------------------------ ROOM 3 ------------------------------------------------
 		case 3:
+			cout << setfill('-') << setw(120) << "" << setfill(' ') << endl;
 			cout << "You find yourself now in a grand hall. The ceiling of the room almost seems to disapear into the darkness. The air in the room itself seems to fill you with a feeling of reverance but you're not sure for what." << endl;
 			cout << "In the center of the room looms an altar that seems to pull you in with its presence." << endl;
 			cout << "You approach the altar and you feel it whispering to you. Urging you to offer up a prayer. What do you decide to do?" << endl;
@@ -541,8 +545,9 @@ int main() {
 			break;
 		// ------------------------------------------------ ROOM 4 ------------------------------------------------
 		case 4:
+			cout << setfill('-') << setw(120) << "" << setfill(' ') << endl;
 			cout << "You enter a chamber with massive double doors at its far end. A lone guardian stands before them, unmoving." << endl;
-			cout << "As you draw closer, its attention shifts to you. It has not yet acted - but it seems ready. What do you choose to do?" << endl;
+			cout << "As you draw closer, its attention shifts to you. It has not yet acted, but it seems ready. What do you choose to do?" << endl;
 			cout << "1. Draw your weapon and ready yourself." << endl;
 			cout << "2. Attempt to deceive the guardian." << endl;
 			cout << "3. Currents Stats" << endl;
@@ -576,7 +581,7 @@ int main() {
 					}
 				}
 				  break;
-			case 2:
+			case 2: {
 				cout << "With confidence you announce that higher authorities have sent you to relieve the guardian of its duty. You explain that you are here to take over... guardianing?" << endl;
 				// Now we roll a D20 to see if the player's charism is enough to deceive the guardian.
 				int deceiveRoll = rollD20();
@@ -610,7 +615,8 @@ int main() {
 						cout << "You have fled from combat and abandoned your quest. Game Over." << endl;
 						gameOver = true;
 					}
-				} else {
+				}
+				else {
 					// If the roll is between 6 and 11 then the player failed to deceive the guardian and are met with a normal combat encounter. The guardian does not get enraged and does not receive any stat boosts for the combat encounter.
 					cout << "The guardian's eyes narrow as it considers your words. There seems to be no other response except for it raising it's weapon. It's time to fight." << endl;
 					// We start combat with the guardian
@@ -632,6 +638,7 @@ int main() {
 						gameOver = true;
 					}
 				}
+			}
 				break;
 			case 3:
 				// If the player chooses to check stats then we call displayStats method
@@ -656,8 +663,67 @@ int main() {
 			break;
 		// ------------------------------------------------ ROOM 5 ------------------------------------------------
 		case 5:
-			gameOver = true; // End the game after the final room
-			break;
+			cout << setfill('-') << setw(120) << "" << setfill(' ') << endl;
+			cout << "You step into the final chamber. The chamber is is filled with a thin, unnatural fog.\nAs you push through it, a figure emerges. A necromancer." << endl;
+			cout << "Every part of your recoils at its presence. This creature is pure evil. It cannot be allowed to live." << endl;
+			cout << "1. You prepare yourself and think 'Time to save the world I guess?'" << endl;
+			cout << "2. You decide that this is too much for you and you make a run for it." << endl;
+			cout << "3. Currents Stats" << endl;
+			cout << "4. Inventory" << endl;
+			cout << "5. Exit Game" << endl;
+
+			// We get the player's choice for this room
+			int room5choice;
+			cin >> room5choice;
+			// ----------------------------------------------- ROOM 5 CHOICES ------------------------------------------------
+			switch (room5choice) {
+			case 1: {
+				cout << "You steel your nerves and prepare to fight the necromancer. This is it. The final battle." << endl;
+				// We start combat with the necromancer
+				CombatResult combatResult = combat(player, necromancer);
+				// After the combat we check to return type of the combat result
+				if (combatResult == PLAYER_WON) {
+					cout << "Against all odds, you have defeated the necromancer and saved the world! Congratulations on beating the game!" << endl;
+					// Then we end the game by setting gameOver to true
+					gameOver = true;
+				}
+				else if (combatResult == PLAYER_DIED) {
+					// If the player died in combat then we tell the player that they have died and end the game by setting gameOver to true
+					cout << "You have died in combat to the " << necromancer.name << " . Game Over." << endl;
+					gameOver = true;
+				}
+				else if (combatResult == PLAYER_EXITED) {
+					// If the player chose to exit combat then we tell the player that they have fled and abandoned their quest and end the game by setting gameOver to true
+					cout << "You have fled from combat and abandoned your quest. Game Over." << endl;
+					gameOver = true;
+				}
+			}
+				break;
+			case 2:
+				cout << "You just wanted a simple adventure, not whatever this is. You're just a coward after all. You turn around and abandon your quest." << endl;
+				// We end the game by setting gameOver to true
+				gameOver = true;
+				break;
+			case 3:
+				// If the player chooses to check stats then we call displayStats method
+				player.displayStats();
+				// Since the player is still in the same room we don't change the current room number and we just break and the previous switch statement will run again with the same room options for the player to choose from
+				break;
+			case 4:
+				// If the player chooses to check their inventory then we call the useItem method which will display the player's inventory and allow them to use an item if they choose to
+				player.useItem();
+				// Again we break without changing the current room number
+				break;
+			case 5:
+				// If the player chooses to exit the game then we set gameOver to true to end the loop and end the game
+				cout << "You have chosen to exit the game." << endl;
+				gameOver = true;
+				break;
+			default:
+				// If the player enters an invalid choice then we display an error message
+				cout << "Invalid choice! Please select a valid option number." << endl;
+				break;
+			}	
 		// ------------------------------------------------ DEFAULT ------------------------------------------------
 		default: {
 			// If the current room number does not match any of the cases then we end the game 
