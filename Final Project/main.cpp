@@ -319,7 +319,7 @@ int main() {
 			cout << setfill('-') << setw(120) << "" << setfill(' ') << endl;
 			cout << "After traversing the long, narrow hallway you enter a dimly lit room. As your stumble around the room you find your self face to face with a ghoul!" << endl;
 			cout << "You realize the ghoul seems to be holding something shiny that you might want." << endl;
-			cout << "You could challenge the ghoul and take what it's holding for yourself or you could use the darkness of the room to flee but you might not escape unscathed.";
+			cout << "You could challenge the ghoul and take what it's holding for yourself or you could use the darkness of the room to flee but you might not escape unscathed." << endl;
 			cout << "1: Challenge the ghoul for the shiny object." << endl;
 			cout << "2. Make a run for it!" << endl;
 			cout << "3. Currents Stats" << endl;
@@ -473,12 +473,12 @@ int main() {
 					cout << "As you pray, the words seem to come from someone-or something-else entirely. They are not your own, yet they fall from your lips with absolute certainty. Almost as if they have been placed there." << endl;
 					cout << "As you conclude your prayer, the very air around you seems to grin. Power floods through your body. You feel...Stronger. Faster. Better. Yet somewhere, deep within you, you sense an absence-you are no longer whole." << endl;
 
-					// The player's max hp is reduced by 10 point as the price for their reward
-					player.maxHp -= 10;
+					// The player's max hp is reduced by 5 point as the price for their reward
+					player.maxHp -= 5;
 					// The player restores their HP to full 
 					player.hp = player.maxHp;
-					// The player get a boost of 20 points to their attack power
-					player.atkPwr += 20;
+					// The player get a boost of 10 points to their attack power
+					player.atkPwr += 10;
 					// Display the player's new stat total
 					player.displayStats();
 					// The player moves on to the next room 
@@ -489,8 +489,9 @@ int main() {
 					cout << "You attemp to pray, but the words stumble as they leave your lips. They feel hollow. They feel unworthy." << endl;
 					cout << "When you finish, A sharp pain sears through your skull. The altar has heard your prayer... and found you lacking." << endl;
 
-					// The player is cursed by the altar and loses 10 point to their max hp and 10 points to their attack power
+					// The player is cursed by the altar and loses 10 point to their max hp and 5 points to their attack power
 					player.maxHp -= 10;
+					player.atkPwr -= 5;
 					// Set the player's current HP to the new max HP if their current HP exceeds the new max HP after the curse is applied
 					// Otherwise we can just leave their hp as it is because the curse only reduces the player's max HP 
 					if (player.hp > player.maxHp) {
