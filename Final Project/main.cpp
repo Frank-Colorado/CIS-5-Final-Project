@@ -791,6 +791,9 @@ void applyDamage(Player& player, int damage) {
 	// If the player did block, then the damage value passed in would be reduced by the amount of block that the player had or the full amount might have been absorbed.
 	if (damage > 0) {
 		player.hp -= damage; 
+		if (player.hp < 0) {
+			player.hp = 0; // Ensure that the player's HP does not go below 0
+		}
 		cout << "You take " << damage << " damage! Your remaining HP is: " << player.hp << endl;
 	}
 }
@@ -833,7 +836,7 @@ CombatResult combat(Player& player, Monster& monster) {
 			cout << "You attack the " << monster.name << " and deal " << playerDmg << " damage!" << endl;
 			break;
 		}
-	
+
 		case BLOCK: {
 			// If the player chooses to block then we will increase their block stat by rolling a D20. 
 			// This block stat will reduce the damage taken from attacks 
@@ -852,7 +855,7 @@ CombatResult combat(Player& player, Monster& monster) {
 			player.useItem();
 			break;
 		}
-		
+
 		case EXIT: {
 			// If the player chooses to exit combat then we set combatOver to true to end the combat loop and we return the result of PLAYER_EXITED
 			cout << "You have chosen to exit combat." << endl;
@@ -860,7 +863,7 @@ CombatResult combat(Player& player, Monster& monster) {
 			result = PLAYER_EXITED;
 			break;
 		}
-	
+
 		default:
 			cout << "Invalid choice! Please select a valid action number." << endl;
 			break;
@@ -878,7 +881,7 @@ CombatResult combat(Player& player, Monster& monster) {
 		// We calculate the damage the monster deals to the player by rolling a D20 and adding the monster's attack power
 		int monsterDmg = rollD20() + monster.atkPwr;
 		// Then we print out the damage that the monster is trying to deal to the player
-			cout << "The " << monster.name << " attacks you for " << monsterDmg << " damage!" << endl;
+		cout << "The " << monster.name << " attacks you for " << monsterDmg << " damage!" << endl;
 		// Then we call the applyDamage function to apply the damage to the player
 		applyDamage(player, monsterDmg);
 
@@ -888,7 +891,7 @@ CombatResult combat(Player& player, Monster& monster) {
 			combatOver = true;
 			result = PLAYER_DIED;
 			continue; // Skip the rest of the loop and go to the next iteration which will check the while loop condition and break since combatOver is now true
+		}
 	}
-
 	return result;
 }
