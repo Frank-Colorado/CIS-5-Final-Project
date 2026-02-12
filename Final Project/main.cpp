@@ -207,9 +207,10 @@ int main() {
 	// Create a player with the name entered by the user and default stats
 	Player player(playerName, 150, 20);
 	// Monsters for the player to fight
-	Monster goblin("Goblin", 50, 10);
-	Monster orc("Orc", 80, 15);
-	Monster necromancer("Necromancer", 150, 25);
+	Monster phantom("Phantom", 50, 10);
+	Monster ghoul("Ghoul", 70, 15);
+	Monster guardian("Guardian", 85, 20);
+	Monster necromancer("Necromancer", 100, 25);
 
 	// intro dialogue displaying the player's name and stats
 	cout << "Welcome, " << player.name << "! You are a brave adventurer embarking on a quest." << endl;
@@ -266,11 +267,11 @@ int main() {
 				break;
 			case 2: {
 				// If the player choose to explore the chamber then we give them a reward but also a consequence for taking something that wasn't theirs
-				cout << "You decide to explore the chamber and find a health potion hidden in a chest! But something in the shadows of the great chamber seems upset that you took something that wasn't yours. You are confronted by a Goblin!" << endl;
+				cout << "You decide to explore the chamber and find a health potion hidden in a chest! But something in the shadows of the great chamber seems upset that you took something that wasn't yours. You are confronted by a Phantom!" << endl;
 				// We add the health potion to the player's inventory
 				player.addItem(HEALTH_POTION);
 				// Here we would call a function to handle the combat between the player and the goblin
-				CombatResult combatResult = combat(player, goblin);
+				CombatResult combatResult = combat(player, phantom);
 				// After the combat we check to return type of the combat result 
 				if (combatResult == PLAYER_WON) {
 					cout << "After your victory you decide to head down the hallway..." << endl;
@@ -279,7 +280,7 @@ int main() {
 				}
 				else if (combatResult == PLAYER_DIED) {
 					// If the player died in combat then we tell the player that they have died and end the game by setting gameOver to true
-					cout << "You have died in combat to the " << goblin.name << " . Game Over." << endl;
+					cout << "You have died in combat to the " << phantom.name << " . Game Over." << endl;
 					gameOver = true;
 				}
 				else if (combatResult == PLAYER_EXITED) {
@@ -313,10 +314,10 @@ int main() {
 
 		// ------------------------------------------------ ROOM 2 ------------------------------------------------
 		case 2:
-			cout << "After traversing the long, narrow hallway you enter a dimly lit room. As your stumble around the room you find your self face to face with a large orc!" << endl;
+			cout << "After traversing the long, narrow hallway you enter a dimly lit room. As your stumble around the room you find your self face to face with a ghoul!" << endl;
 			cout << "You realize the orc seems to be holding something shiny that you might want." << endl;
-			cout << "You could challenge the orc and take what it's holding for yourself or you could use the darkness of the room to flee but you might not escape unscathed.";
-			cout << "1: Challenge the orc for the shiny object." << endl;
+			cout << "You could challenge the ghoul and take what it's holding for yourself or you could use the darkness of the room to flee but you might not escape unscathed.";
+			cout << "1: Challenge the ghoul for the shiny object." << endl;
 			cout << "2. Make a run for it!" << endl;
 			cout << "3. Currents Stats" << endl;
 			cout << "4. Inventory" << endl;
@@ -328,12 +329,12 @@ int main() {
 			// ----------------------------------------------- ROOM 2 CHOICES ------------------------------------------------
 			switch (room2Choice) {
 			case 1: {
-				cout << "You decide to challenge the orc for the shiny object. You engage in combat with the orc!" << endl;
+				cout << "You decide to challenge the ghoul for the shiny object. You engage in combat with the orc!" << endl;
 				// Here we call the function to handle the combat between the player and the orc
-				CombatResult combatResult = combat(player, orc);
+				CombatResult combatResult = combat(player, ghoul);
 				// After the combat we check to return type of the combat result
 				if (combatResult == PLAYER_WON) {
-					cout << "After your victory you take the shiny object off the orc and find that it was a strength elixir! You add it to your inventory and then you head to the next room..." << endl;
+					cout << "After your victory you take the shiny object off the ghoul and find that it was a strength elixir! You add it to your inventory and then you head to the next room..." << endl;
 					// Add the strength elix to the player's inventory 
 					player.addItem(STRENGTH_ELIXIR);
 					// Then we move on to the next room 
@@ -341,7 +342,7 @@ int main() {
 				}
 				else if (combatResult == PLAYER_DIED) {
 					// If the player died in combat then we tell the player that they have died and end the game by setting gameOver to true
-					cout << "You have died in combat to the " << orc.name << " . Game Over." << endl;
+					cout << "You have died in combat to the " << ghoul.name << " . Game Over." << endl;
 					gameOver = true;
 				}
 				else if (combatResult == PLAYER_EXITED) {
@@ -352,25 +353,25 @@ int main() {
 			}
 				  break;
 			case 2: {
-				cout << "You bring your body low to the ground and cloak yourself in the darkness of the room. You attempt to slip past the orc but he catches you with a blow to the side." << endl;
+				cout << "You bring your body low to the ground and cloak yourself in the darkness of the room. You attempt to slip past the ghoul but he catches you with a blow to the side." << endl;
 				// Here we roll a D20 to check how much dmg the player takes from the orc's attack as they try to flee
 				// We will also use this roll to see if the blow was a critical hit (15 or higher) or if it was a critical fail (5 or lower)
 				int fleeRoll = rollD20();
 				// If the flee roll is 15 or higher then we consider that a critical hit.
 				// The player will take the damage and be caught by the orc and forced into combat.
 				if (fleeRoll >= 15) {
-					cout << "Critical Hit! The orc's blow is especially powerful and knocks you to the ground. Now you have no way to escape and have to fight to survive!" << endl;
+					cout << "Critical Hit! The ghoul's blow is especially powerful and knocks you to the ground. Now you have no way to escape and have to fight to survive!" << endl;
 					// We calculate the damage the orc deals to the player by rolling a D20 and adding the orc's attack power.
-					int orcDmg = rollD20() + orc.atkPwr;
+					int ghoulDmg = rollD20() + ghoul.atkPwr;
 					// Then we subtract that damage from the player's HP. 
-					applyDamage(player, orcDmg);
+					applyDamage(player, ghoulDmg);
 					// After the player takes damage from the orc's attack then we check to see if they are still alive. 
 					if (player.hp > 0) {
 						// If the player is still alive then we call the combat function to handle the combat between the player and the orc
-						CombatResult combatResult = combat(player, orc);
+						CombatResult combatResult = combat(player, ghoul);
 						// After the combat we check to return type of the combat result
 						if (combatResult == PLAYER_WON) {
-							cout << "After your victory you take the shiny object off the orc and find that it was a strength elixir! You add it to your inventory and then you head to the next room..." << endl;
+							cout << "After your victory you take the shiny object off the ghoul and find that it was a strength elixir! You add it to your inventory and then you head to the next room..." << endl;
 							// Add the strength elix to the player's inventory 
 							player.addItem(STRENGTH_ELIXIR);
 							// Then we move on to the next room 
@@ -378,7 +379,7 @@ int main() {
 						}
 						else if (combatResult == PLAYER_DIED) {
 							// If the player died in combat then we tell the player that they have died and end the game by setting gameOver to true
-							cout << "You have died in combat to the " << orc.name << " . Game Over." << endl;
+							cout << "You have died in combat to the " << ghoul.name << " . Game Over." << endl;
 							gameOver = true;
 						}
 						else if (combatResult == PLAYER_EXITED) {
@@ -389,32 +390,32 @@ int main() {
 					}
 					else {
 						// If the player is not alive after taking damage from trying to flee then we tell them that they have died and end the game by setting gameOver to true
-						cout << "The blow from the orc was too much for you and you died as you tried to flee. Game Over." << endl;
+						cout << "The blow from the ghoul was too much for you and you died as you tried to flee. Game Over." << endl;
 						gameOver = true;
 					}
 				} else if (fleeRoll <= 5) {
 						// If the flee roll is 5 or lower then we consider that a critical fail. 
 						// The player takes no damage from the orc and they are able to swipe the shiny object off its waist in the process
-						cout << "Critical Miss! Your dexterity is unmatched and the orc's blow slides of your body as if you were darkness iteself." << endl;
-						cout << "The orc stumbles after his failed attack and you use this opportunity to swipe the shiny object off his waist! You find that it was a strength elixir and you add it to your inventory." << endl;
+						cout << "Critical Miss! Your dexterity is unmatched and the ghoul's blow slides of your body as if you were darkness iteself." << endl;
+						cout << "The ghoul stumbles after his failed attack and you use this opportunity to swipe the shiny object off his waist! You find that it was a strength elixir and you add it to your inventory." << endl;
 						player.addItem(STRENGTH_ELIXIR);
-						cout << "You successfully flee to the next room and leave the confused orc behind you..." << endl;
+						cout << "You successfully flee to the next room and leave the confused ghoul behind you..." << endl;
 						currentRoom++;
 				} else {
 					// If the flee roll is between 6 and 14 then we consider that a normal attempt to flee. The player takes damage from the orc's attack but they are able to escape and flee to the next room
-					cout << "You take the hit from the orc and lose your footing." << endl;
+					cout << "You take the hit from the ghoul and lose your footing." << endl;
 					// We calculate the damage the orc deals to the player by rolling a D20 and adding the orc's attack power.
-					int orcDmg = rollD20() + orc.atkPwr;
+					int orcDmg = rollD20() + ghoul.atkPwr;
 					// Then we subtract that damage from the player's HP.
 					applyDamage(player, orcDmg);
 					// After the player takes damage from the orc's attack then we check to see if they are still alive.
 					if (player.hp > 0) {
-						cout << "The damage wasn't enough to bring you down and you successfully flee to the next room and leave the orc behind you..." << endl;
+						cout << "The damage wasn't enough to bring you down and you successfully flee to the next room and leave the ghoul behind you..." << endl;
 						currentRoom++;
 					}
 					else {
 						// If the player is not alive after taking damage from trying to flee then we tell them that they have died and end the game by setting gameOver to true
-						cout << "The blow from the orc was too much for you and you died as you tried to flee. Game Over." << endl;
+						cout << "The blow from the ghoul was too much for you and you died as you tried to flee. Game Over." << endl;
 						gameOver = true;
 					}
 				}
@@ -540,7 +541,118 @@ int main() {
 			break;
 		// ------------------------------------------------ ROOM 4 ------------------------------------------------
 		case 4:
-			gameOver = true; // End the game after the final room
+			cout << "You enter a chamber with massive double doors at its far end. A lone guardian stands before them, unmoving." << endl;
+			cout << "As you draw closer, its attention shifts to you. It has not yet acted - but it seems ready. What do you choose to do?" << endl;
+			cout << "1. Draw your weapon and ready yourself." << endl;
+			cout << "2. Attempt to deceive the guardian." << endl;
+			cout << "3. Currents Stats" << endl;
+			cout << "4. Inventory" << endl;
+			cout << "5. Exit Game" << endl;
+
+			// We get the player's choice for this room
+			int room4choice;
+			cin >> room4choice;
+			// ----------------------------------------------- ROOM 4 CHOICES ------------------------------------------------
+			switch (room4choice) {
+			case 1: {
+				cout << "You draw your weapon and the guardian does the same. You prepare for combat." << endl;
+				// We start combat with the guardian 
+				CombatResult combatResult = combat(player, guardian);
+				// After the combat we check to return type of the combat result
+				if (combatResult == PLAYER_WON) {
+					cout << "You find yourself victorious. Now what was this guardian protecting behind these doors?" << endl;
+					// Then we move on to the next room 
+					currentRoom++;
+					}
+				else if (combatResult == PLAYER_DIED) {
+					// If the player died in combat then we tell the player that they have died and end the game by setting gameOver to true
+					cout << "You have died in combat to the " << guardian.name << " . Game Over." << endl;
+					gameOver = true;
+					}
+				else if (combatResult == PLAYER_EXITED) {
+					// If the player chose to exit combat then we tell the player that they have fled and abandoned their quest and end the game by setting gameOver to true
+					cout << "You have fled from combat and abandoned your quest. Game Over." << endl;
+					gameOver = true;
+					}
+				}
+				  break;
+			case 2:
+				cout << "With confidence you announce that higher authorities have sent you to relieve the guardian of its duty. You explain that you are here to take over... guardianing?" << endl;
+				// Now we roll a D20 to see if the player's charism is enough to deceive the guardian.
+				int deceiveRoll = rollD20();
+				// If the deceive roll is 12 or higher then we consider that the player successfully deceived the guardian and they are able to pass through the doors without combat.
+				if (deceiveRoll >= 12) {
+					cout << "The guardian seems to consider your words for a moment. Then, without a word, it steps aside. It seems your bluff has worked and you are able to pass through the doors without combat." << endl;
+					// Move to the next room
+					currentRoom++;
+				}
+				else if (deceiveRoll <= 5) {
+					// If the deceive roll is 5 or lower then we consider that the player failed to deceive the guardian and they are forced into combat.
+					cout << "The guardian's eyes narrow as it considers your words. It seems to see through your deception and seems enraged that you would even try to. It bolsters itself and prepares to attack!" << endl;
+					// Since the player has critically failed the deception check, the guardian becomes enraged and gets a boost to its atkPwr and HP for the combat encounter
+					guardian.atkPwr += 5;
+					guardian.hp += 10;
+					// We start combat with the guardian 
+					CombatResult combatResult = combat(player, guardian);
+					// After the combat we check to return type of the combat result
+					if (combatResult == PLAYER_WON) {
+						cout << "You find yourself victorious. Now what was this guardian protecting behind these doors?" << endl;
+						// Then we move on to the next room 
+						currentRoom++;
+					}
+					else if (combatResult == PLAYER_DIED) {
+						// If the player died in combat then we tell the player that they have died and end the game by setting gameOver to true
+						cout << "You have died in combat to the " << guardian.name << " . Game Over." << endl;
+						gameOver = true;
+					}
+					else if (combatResult == PLAYER_EXITED) {
+						// If the player chose to exit combat then we tell the player that they have fled and abandoned their quest and end the game by setting gameOver to true
+						cout << "You have fled from combat and abandoned your quest. Game Over." << endl;
+						gameOver = true;
+					}
+				} else {
+					// If the roll is between 6 and 11 then the player failed to deceive the guardian and are met with a normal combat encounter. The guardian does not get enraged and does not receive any stat boosts for the combat encounter.
+					cout << "The guardian's eyes narrow as it considers your words. There seems to be no other response except for it raising it's weapon. It's time to fight." << endl;
+					// We start combat with the guardian
+					CombatResult combatResult = combat(player, guardian);
+					// After the combat we check to return type of the combat result
+					if (combatResult == PLAYER_WON) {
+						cout << "You find yourself victorious. Now what was this guardian protecting behind these doors?" << endl;
+						// Then we move on to the next room
+						currentRoom++;
+					}
+					else if (combatResult == PLAYER_DIED) {
+						// If the player died in combat then we tell the player that they have died and end the game by setting gameOver to true
+						cout << "You have died in combat to the " << guardian.name << " . Game Over." << endl;
+						gameOver = true;
+					}
+					else if (combatResult == PLAYER_EXITED) {
+						// If the player chose to exit combat then we tell the player that they have fled and abandoned their quest and end the game by setting gameOver to true
+						cout << "You have fled from combat and abandoned your quest. Game Over." << endl;
+						gameOver = true;
+					}
+				}
+				break;
+			case 3:
+				// If the player chooses to check stats then we call displayStats method
+				player.displayStats();
+				// Since the player is still in the same room we don't change the current room number and we just break and the previous switch statement will run again with the same room options for the player to choose from
+				break;
+			case 4:
+				// If the player chooses to check their inventory then we call the useItem method which will display the player's inventory and allow them to use an item if they choose to
+				player.useItem();
+				// Again we break without changing the current room number
+				break;
+			case 5:
+				// If the player chooses to exit the game then we set gameOver to true to end the loop and end the game
+				cout << "You have chosen to exit the game." << endl;
+				gameOver = true;
+				break;
+			default:
+				// If the player enters an invalid choice then we display an error message
+				cout << "Invalid choice! Please select a valid option number." << endl;
+				break;
+			}
 			break;
 		// ------------------------------------------------ ROOM 5 ------------------------------------------------
 		case 5:
