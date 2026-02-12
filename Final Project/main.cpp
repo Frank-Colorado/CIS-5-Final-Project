@@ -723,7 +723,8 @@ int main() {
 				// If the player enters an invalid choice then we display an error message
 				cout << "Invalid choice! Please select a valid option number." << endl;
 				break;
-			}	
+			}
+			break;
 		// ------------------------------------------------ DEFAULT ------------------------------------------------
 		default: {
 			// If the current room number does not match any of the cases then we end the game 
