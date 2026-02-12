@@ -21,6 +21,7 @@ using std::min;
 // ------------------------------------------------
 // PLAYER COMBAT ENUM
 // ------------------------------------------------
+// I created this enum to make the switch statement for combat more readable 
 enum PlayerAction {
 	ATTACK = 1,
 	BLOCK,
@@ -31,6 +32,7 @@ enum PlayerAction {
 // ------------------------------------------------
 // COMBAT RESULT ENUM
 // ------------------------------------------------
+// I created this enum to make the post combat logic more readable and simpler to manage.
 enum CombatResult {
 	PLAYER_WON,
 	PLAYER_DIED,
@@ -40,6 +42,8 @@ enum CombatResult {
 // ------------------------------------------------
 // ITEM ENUM
 // ------------------------------------------------
+// I created this enum to make the player's inventory more readable. Since the items are all longer strings, using the enum removes the posibility of typos. 
+// I think doing it this way also makes the items easier to scale. So if I wanted to add more items to the game it would be more effecient this way. 
 enum Item {
 	HEALTH_POTION,
 	STRENGTH_ELIXIR
@@ -50,9 +54,10 @@ enum Item {
 // ------------------------------------------------
 struct Player {
 	string name;
-	int hp;
+	int hp; // Players current HP. This can be changed by taking damage in combat or by using a health potion from the player's inventory.
 	int maxHp = 150; // Max HP that the player can have. This is used to prevent the player's HP from exceeding 100 when they use a health potion.
-	int atkPwr;
+	int atkPwr; // Player's attack power. This is used to calculate the damage the player deals to monsters in combat. This can be increased by using a strength elixir or from the altar's boon in room 3
+	// I don't think I really needed this block stat and it's not super useful in this game. The player really has no reason to click it but I did want to try writing logic for calculating damage taken when a player has block points.
 	int block = 0; // Block stat that can be increased by using a block action in combat. I set it to 0 by default and I will reset it to 0 at the end of each combat.
 	Item inventory[3] = {}; // Simple inventory with 3 slots
 	int inventorySize = 0; // Inventory starts empty
@@ -61,11 +66,14 @@ struct Player {
 	Player(const string& name, int hp, int atkPwr) : name(name), hp(hp), atkPwr(atkPwr) {}
 
 	// Method to display the player's current stats
+	// This method is called in various places to update the character on how healthy they are
+	// It can also be called by the player at any time in the rooms to check their current stats
 	void displayStats() const {
 		cout << "You currently have " << hp << " HP and " <<atkPwr << " attack power." << endl;
 	}
 
 	// Helper method to convert an item enum value to a string for display purposes
+	// Since the items are represented as enums, I created this helper method to convert them to strings so that they are more readable when displayed to the player in the inventory and when they use an item.
 	string itemToString(const Item& item) const {
 		switch (item) {
 		case HEALTH_POTION:
@@ -80,12 +88,14 @@ struct Player {
 	// Method to add an item to the player's inventory
 	void addItem(const Item item) {
 		// Check the current inventory size before adding an item
+		// If their inventorySize is less than 3 then we can add the item to the next slot in the inventory and increase the inventory size by 1
 		if (inventorySize < 3) {
 			inventory[inventorySize] = item;
 			inventorySize++;
 			cout << "You have added " << itemToString(item) << " to your inventory." << endl;
 		}
 		else {
+			// Otherwise, we let the player know their inventory is full and they can't add the item
 			cout << "Your inventory is full! You cannot add " << itemToString(item) << "." << endl;
 		}
 
@@ -140,7 +150,7 @@ struct Player {
 			return;
 		}
 
-		// I create a variable to hold the string value of the item that the player has chosen to use
+		// I create a variable to hold the enum value of the selected item for the switch statement
 		Item selectedItem = inventory[choice - 1];
 
 		switch (selectedItem) {
@@ -167,9 +177,14 @@ struct Player {
 		};
 		// Finally we remove the used item from the player's inventory 
 		// We set i to the index of the item that the player has chosen to use
-		// We loop through the inventory as long as i is less than the inventory size -1. This is because we want to shift the items and the new last item in the inventory will be empty after the shift so we don't want to include it in the loop
+		// We loop through the inventory as long as i is less than the inventory size -1. This is because we want to shift the items and we don't want to go out of bounds of the inventory array when we access inventory[i +1]
 		for (int i = choice - 1; i < inventorySize - 1; i++) {
 			inventory[i] = inventory[i + 1]; // We grab the item that was previously in the next slot and move it to the current slot
+			// Here we are basically duplicating over all the items in the inventory and shifting them down one slot
+			// The final 2 items in the inventory will be duplicated but that won't matter because we are decreasing the inventory size by 1 
+			// So if the the player has 3 items [Health Potion, Strength Elixir, Health Potion] and they choose to use the strength elixir
+			// Then the inventory will look like this [Health Potion, Health Potion, Health Potion] after the loop.
+			// But then we decrease the inventory size by 1 so the inventory will be considered to only have 2 items so what we can access is actually [Health Potion, Health Potion]
 		}
 		inventorySize--; // Decrease the inventory size by 1
 	}
@@ -180,9 +195,9 @@ struct Player {
 // MONSTER STRUCTURE
 // ------------------------------------------------
 struct Monster {
-	string name;
-	int hp;
-	int atkPwr;
+	string name; // Monster's name for display purposes in combat and dialogue
+	int hp; // Monster's HP. This is used to track how much health the monster has left in combat and to determine when the monster is defeated.
+	int atkPwr; // Monster's attack power. This is used to calculate the damage the monster deals to the player in combat.
 	Monster(const string& name, int hp, int atkPwr) : name(name), hp(hp), atkPwr(atkPwr) {}
 };
 
@@ -197,10 +212,13 @@ void applyDamage(Player& player, int damage);
 
 
 int main() {
+	// Seed the random number generator with the current time to ensure different outcomes each time the game is played
+	// I was getting a warning with srand(time(nullptr)) and on stack overflow I read that srand expects an unsigned int and time returns a time_t so I added a static cast to convert the time_t to an unsigned int and that got rid of the warning
 	srand(static_cast<unsigned int>(time(nullptr)));
 
 	cout << "Welcome to this simple DnD like game!" << endl;
 	cout << "Please enter the name of your character: ";
+	// We get the player's input for their name
 	string playerName;
 	cin >> playerName;
 
@@ -237,6 +255,7 @@ int main() {
 	bool gameOver = false;
 
 	// We start the game loop and it continues as long as the game is not over
+	// Once gameOver is set to true then the loop will end 
 	while (!gameOver) {
 		// We use a switch statement to determine what happens in each room based on the current room number
 		switch (currentRoom) {
